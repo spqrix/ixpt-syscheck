@@ -1,21 +1,11 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	// "log"
 	"os"
-	"os/exec"
-	"runtime"
-	"strings"
 	"github.com/spf13/cobra"
+	"github.com/spqrix/ixpt-syscheck/executables"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -25,25 +15,14 @@ var rootCmd = &cobra.Command{
 Check to ensure they are on the system, as well as configs and other files.`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		operating_system := runtime.GOOS
-		if operating_system != "linux" {
-			err := errors.New("This command is for Linux only.")
-			fmt.Println(err)
+		verb := cmd.Flags().Lookup("verbose").Changed
+		missing_execs, err := executables.CheckForExecutables(args, verb)
+		if err != nil {
+			fmt.Printf("Error during system check: %q", err)
 			os.Exit(1)
 		}
-		for _, c := range args {
-			script_command := fmt.Sprintf("type -ap %s", c)
-			command := exec.Command("sh", "-c", script_command)
-			var out strings.Builder
-			command.Stdout = &out
-			err := command.Run()
-			if err != nil {
-				fmt.Printf("Failed to locate file path for: %s\n", c)
-			} else {
-				if cmd.Flags().Lookup("verbose").Changed {
-					fmt.Printf("Path for %s:\n\t%s", c,out.String())
-				}
-			}
+		for _, c := range missing_execs {
+			fmt.Printf("Failed to locate file path for: %s\n", c)
 		}
 	},
 }
