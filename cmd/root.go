@@ -10,9 +10,9 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "ixpt-syscheck [...commands]",
-	Short: "A simple way to check for dependency applications on your system.",
-	Long: `Sometimes our apps rely on other apps in order to function properly.
-Check to ensure they are on the system, as well as configs and other files.`,
+	Short: "A simple way to check for dependency executables (commands) on your system.",
+	Long: `Sometimes our apps rely on other executables (commands) in order to function properly.
+Check to ensure they are on the system.`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		verb := cmd.Flags().Lookup("verbose").Changed
